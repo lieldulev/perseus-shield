@@ -1,0 +1,29 @@
+development: &development
+  # redis server host:port
+  redis: localhost:6379
+  # all cache keys will be prefixed with this
+  cache_key_prefix: persues_shield
+  # the bucket name to store the files in
+  s3_bucket: test-liel.boxee.tv
+  # the root to use in the bucket
+  s3_root:
+  # AWS credentials
+  aws_key: 1ZH5JBHMCGYY66DYHE02
+  aws_secret: Cr1WW6WP8eV5CvTnkuesdM5Q+txUUzAY+D0Tq0V3
+  # only urls that match this regex will be resized (no need for / at the start/end)
+  url_regex: ^https?:\/\/.*\.?boxee\.tv\/.+$
+  # schemaless uri that points to the bucket's root 
+  external_uri: test-liel.boxee.tv.s3.amazonaws.com
+
+test: &test
+  <<: *development
+
+production: &production
+  redis: localhost:6379
+  cache_key_prefix: persues_shield
+  s3_bucket: psp.boxee.tv
+  s3_root:
+  aws_key: 1ZH5JBHMCGYY66DYHE02
+  aws_secret: Cr1WW6WP8eV5CvTnkuesdM5Q+txUUzAY+D0Tq0V3
+  url_regex: ^https?:\/\/.*\.?boxee\.tv.*$
+  external_uri: psp.boxee.tv
