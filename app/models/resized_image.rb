@@ -1,20 +1,20 @@
 class ResizedImage
-  
+
   attr_accessor :url, :width, :height, :uniq_id, :cache_id, :local_image, :remote_url, :image_extension
 
-  def initialize(url, width = nil, height = nil, load_from_cache = true)
+  def initialize(url, width = nil, height = nil, use_cache = true)
     raise Errors::UnsupportedURL unless ResizedImage.url_valid?(url)
     @url = url
     @width = width
     @height = height
-    load_from_cache if load_from_cache && exist?
+    load_from_cache if use_cache && exist?
   end
 
   def self.gen_uniq_id(url, width = nil, height = nil)
     # strip (s)ftp or http(s) schemes, concat width and height and md5 it.
     Digest::MD5.hexdigest("#{url.gsub(/(https?|s?ftp):\/\//, '')}_#{width.to_s}_#{height.to_s}i")
   end
-  
+
   def self.gen_cache_id(uniq_id)
     "#{PerseusShield.config.cache_key_prefix}:#{uniq_id}"
   end
@@ -25,7 +25,7 @@ class ResizedImage
       URI.parse(url)
     rescue Exception => e
       return false
-    end 
+    end
     return true
   end
   def exist?
@@ -75,7 +75,7 @@ class ResizedImage
         conn = Fog::Storage.new({:provider=>'AWS', :aws_access_key_id => PerseusShield.config.aws_key, :aws_secret_access_key => PerseusShield.config.aws_secret})
         directory = conn.directories.get(PerseusShield.config.s3_bucket) || conn.directories.create(:key => PerseusShield.config.s3_bucket, :public=> true)
         file = directory.files.create({:key => "#{PerseusShield.config.s3_root.blank? ? '' : PerseusShield.config.s3_root+'/'}#{remote_path}", :body => File.open(@local_image), :public => true})
-        return true if file 
+        return true if file
       rescue Exception => e
           Rails.logger.info "Failed to upload #{local_image} to #{PerseusShield.config.s3_bucket} : #{PerseusShield.config.s3_root}/#{remote_path} because: #{e.message}"
       end
